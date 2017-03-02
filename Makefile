@@ -6,8 +6,8 @@ OBJDIR=./obj
 INCDIR=./include
 
 CXX=gcc
-CXXFLAGS=-g3 -std=gnu99 -I$(INCDIR)
-CXXLIBS=-lGL -lX11
+CXXFLAGS=-g3 -std=gnu99 -I$(INCDIR) -pedantic
+CXXLIBS=-lGL -lGLU -lX11
 
 SOURCES=$(wildcard $(SRCDIR)/*.c)
 OBJECTS=$(patsubst $(SRCDIR)/%,$(OBJDIR)/%,$(patsubst %.c,%.o,$(SOURCES)))

@@ -6,7 +6,7 @@ int main(int argc, char* argv[]){
     return -1;
   }
 
-  while (ngxRun(dev) != 0){
+  while (ngxUpdate(dev) != 0){
     ;
   }
 
