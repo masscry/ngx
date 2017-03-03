@@ -1,4 +1,5 @@
 *.log
 *.o
 *.swp
-ngx
+bin/*
+*.ngx
