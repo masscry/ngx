@@ -19,8 +19,11 @@ int main(int argc, char* argv[]){
     return -1;
   }
 
-  printf("Block size: %u\n", ngxArcBlockSize(arc));
-  printf("Block count: %u\n", ngxArcBlockCount(arc));
+  uint16_t bsz = ngxArcBlockSize(arc);
+  uint16_t bcn = ngxArcBlockCount(arc);
+
+  printf("Block size: %u\n", bsz);
+  printf("Block count: %u\n", bcn);
 
   ngxArcCleanup(&arc);
   return 0;

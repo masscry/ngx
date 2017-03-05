@@ -65,7 +65,7 @@ void test001(const char* fname){
   }
 
   arc = ngxArcInit(fname, 0);
-  blkid = ngxArcDataPut(arc, ibuf, DLEN*sizeof(int));
+  blkid = ngxArcDataPut(arc, ibuf, DLEN*sizeof(int), 2);
   EXPECT(blkid != 0xFFFF);
 
   buf = (int*) ngxArcDataGet(arc, blkid, &len);

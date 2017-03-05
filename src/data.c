@@ -30,6 +30,17 @@ struct ngx_block_t {
   uint8_t blkdata[]; /**< Block data */
 };
 
+struct ngx_entry_t {
+  uint16_t blkid;
+  char fname[12];
+  uint8_t flags;
+};
+
+struct ngx_index_t {
+  uint16_t itcnt;
+  struct ngx_entry_t items[];
+};
+
 struct ngx_file_t {
   uint32_t magic; /**< archive file magic */
   uint32_t version; /**< archive version */
@@ -369,7 +380,7 @@ int ngxArcUpdateBlock(NGXARC arc, const NGXBLK blk){
 
 }
 
-uint16_t ngxArcDataPut(NGXARC arc, const void* data, uint32_t datalen){
+uint16_t ngxArcDataPut(NGXARC arc, const void* data, uint32_t datalen, uint16_t blkid){
   NGXBLK pos = 0;
   uint8_t* cursor = (uint8_t*) data;
   uint16_t result = 0xFFFF;
@@ -380,7 +391,11 @@ uint16_t ngxArcDataPut(NGXARC arc, const void* data, uint32_t datalen){
     return 0xFFFF;
   }
 
-  pos = ngxArcBlock(arc, arc->blkcnt);
+  if (blkid == 0xFFFF){
+    blkid = arc->blkcnt;
+  }
+
+  pos = ngxArcBlock(arc, blkid);
   if (pos == 0){
     return 0xFFFF;
   }
@@ -395,7 +410,12 @@ uint16_t ngxArcDataPut(NGXARC arc, const void* data, uint32_t datalen){
     datalen -= ln;
     cursor += ln;
     if (datalen > 0){
-      NGXBLK next = ngxArcBlock(arc, arc->blkcnt);
+      NGXBLK next = 0;
+      if (ngxBlockNextID(pos) == 0xFFFF){
+        next = ngxArcBlock(arc, arc->blkcnt);
+      } else {
+        next = ngxArcBlock(arc, ngxBlockNextID(pos));
+      }
       if (next == 0){
         ngxBlockCleanup(&pos);
         return 0xFFFF;

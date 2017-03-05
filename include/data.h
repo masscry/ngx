@@ -16,6 +16,8 @@ typedef struct ngx_ablock_t* NGXBLK;
 
 typedef struct ngx_archive_t* NGXARC;
 
+typedef struct ngx_index_t NGXINDEX;
+
 /**
  * Create new archive.
  */
@@ -69,11 +71,36 @@ void ngxBlockCleanup(NGXBLK* blk);
 /**
  * Put data to archive.
  */
-uint16_t ngxArcDataPut(NGXARC arc, const void* data, uint32_t datalen);
+uint16_t ngxArcDataPut(NGXARC arc, const void* data, uint32_t datalen, uint16_t blkid);
 
 /**
  * Get data from archive.
  */
 void* ngxArcDataGet(NGXARC arc, uint16_t blkid, uint32_t* datalen);
+
+/**
+ * Create new index.
+ */
+NGXINDEX ngxIndexInit();
+
+/**
+ * Cleanup index.
+ */
+void ngxIndexCleanup(NGXINDEX* index);
+
+/**
+ * Insert new item into index.
+ */
+int ngxIndexInsert(NGXINDEX index, const char* fname, uint16_t blkid);
+
+/**
+ * Total index size.
+ */
+int ngxIndexCount(const NGXINDEX index);
+
+/**
+ * Total index length in bytes.
+ */
+uint32_t ngxIndexSize(const NGXINDEX index);
 
 #endif /* __DATA_HEADER__ */
