@@ -6,8 +6,8 @@ OBJDIR=./obj
 INCDIR=./include
 TSTDIR=./test
 
-CXX=gcc
-CXXFLAGS=-g3 -std=gnu99 -I$(INCDIR) -pedantic
+CXX=afl-gcc
+CXXFLAGS=-g3 -m32 -std=gnu99 -I$(INCDIR) -pedantic
 CXXLIBS=-lGL -lGLU -lX11
 
 SOURCES=$(wildcard $(SRCDIR)/*.c)
@@ -25,13 +25,17 @@ clean:
 	rm -rvf $(BINDIR)/
 	rm -rvf $(OBJDIR)/
 
-test: $(BINDIR)/ngxData
-	$(BINDIR)/ngxData
+test: $(BINDIR)/ngxData $(BINDIR)/ngxls
+	$(BINDIR)/ngxData test.ngx
+	$(BINDIR)/ngxls test.ngx
 
 $(BINDIR) $(OBJDIR):
 	mkdir -v $@
 
 $(BINDIR)/ngxData: $(OBJECTS) $(TSTDIR)/ngxData.c
+	$(CXX) $(CXXFLAGS) -o $@ $^ $(CXXLIBS)
+
+$(BINDIR)/ngxls: $(OBJECTS) $(TSTDIR)/ngxls.c
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(CXXLIBS)
 
 $(BINDIR)/$(PROJECT): $(OBJECTS) $(PROJECT)/entry.c

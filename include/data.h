@@ -6,17 +6,20 @@
  *
  */
 
+#include <stdint.h>
+#include <stddef.h>
+
 #ifndef __DATA_HEADER__
 #define __DATA_HEADER__
 
-typedef struct ngx_resource_t* NGXRES;
+typedef struct ngx_ablock_t* NGXBLK;
 
 typedef struct ngx_archive_t* NGXARC;
 
 /**
  * Create new archive.
  */
-NGXARC ngxArcInit(const char* filename);
+NGXARC ngxArcInit(const char* filename, int readonly);
 
 /**
  * Cleanup archive.
@@ -24,38 +27,53 @@ NGXARC ngxArcInit(const char* filename);
 void ngxArcCleanup(NGXARC* oarc);
 
 /**
- * Save archive.
+ * Get archive block size.
  */
-int ngxArcSave(const char* filename);
+uint16_t ngxArcBlockSize(const NGXARC arc);
 
 /**
- * Create new resource.
+ * Get archive block count.
  */
-NGXRES ngxResInit();
+uint16_t ngxArcBlockCount(const NGXARC arc);
 
 /**
- * Cleanup resource.
+ * Get block from archive.
  */
-void ngxResCleanup(NGXRES* ores);
+NGXBLK ngxArcBlock(NGXARC arc, uint16_t blkid);
 
 /**
- * Get resource copy with defined name.
+ * Update block in archive.
  */
-NGXRES ngxArcGet(const char* name);
+int ngxArcUpdateBlock(NGXARC arc, const NGXBLK blk);
 
 /**
- * Put resource copy to archive with name.
+ * Get block ID.
  */
-int ngxArcPut(const char* name, const NGXRES res);
+uint16_t ngxBlockID(const NGXBLK blk);
 
 /**
- * Get resource data.
+ * Get next block ID.
  */
-void* ngxResData(const NGXRES res);
+uint16_t ngxBlockNextID(const NGXBLK blk);
 
 /**
- * Get resource size.
+ * Set next block ID.
  */
-int ngxResSize(const NGXRES res);
+int ngxBlockSetNextID(NGXBLK blk, uint16_t nid);
+
+/**
+ * Cleanup block data copy.
+ */
+void ngxBlockCleanup(NGXBLK* blk);
+
+/**
+ * Put data to archive.
+ */
+uint16_t ngxArcDataPut(NGXARC arc, const void* data, uint32_t datalen);
+
+/**
+ * Get data from archive.
+ */
+void* ngxArcDataGet(NGXARC arc, uint16_t blkid, uint32_t* datalen);
 
 #endif /* __DATA_HEADER__ */
