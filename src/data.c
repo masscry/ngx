@@ -30,17 +30,6 @@ struct ngx_block_t {
   uint8_t blkdata[]; /**< Block data */
 };
 
-struct ngx_entry_t {
-  uint16_t blkid;
-  char fname[12];
-  uint8_t flags;
-};
-
-struct ngx_index_t {
-  uint16_t itcnt;
-  struct ngx_entry_t items[];
-};
-
 struct ngx_file_t {
   uint32_t magic; /**< archive file magic */
   uint32_t version; /**< archive version */
