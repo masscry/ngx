@@ -6,7 +6,7 @@ OBJDIR=./obj
 INCDIR=./include
 TSTDIR=./test
 
-CXX=afl-gcc
+CXX=gcc
 CXXFLAGS=-g3 -m32 -std=gnu99 -I$(INCDIR) -pedantic
 CXXLIBS=-lGL -lGLU -lX11
 
