@@ -7,7 +7,7 @@ INCDIR=./include
 TSTDIR=./test
 
 CXX=gcc
-CXXFLAGS=-g3 -m32 -std=gnu99 -I$(INCDIR) -pedantic
+CXXFLAGS=-g3 -std=gnu99 -I$(INCDIR) -pedantic
 CXXLIBS=-lGL -lGLU -lX11
 
 SOURCES=$(wildcard $(SRCDIR)/*.c)
