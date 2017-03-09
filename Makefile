@@ -25,10 +25,11 @@ clean:
 	rm -rvf $(BINDIR)/
 	rm -rvf $(OBJDIR)/
 
-test: $(BINDIR)/ngxData $(BINDIR)/ngxls $(BINDIR)/ngxTree
+test: $(BINDIR)/ngxData $(BINDIR)/ngxls $(BINDIR)/ngxTree $(BINDIR)/ngxar
 	$(BINDIR)/ngxData test.ngx
 	$(BINDIR)/ngxTree test.ngx
 	$(BINDIR)/ngxls test.ngx
+	$(BINDIR)/ngxar src.ngx src/*.c include/*.h test/*.c
 
 $(BINDIR) $(OBJDIR):
 	mkdir -v $@
@@ -37,6 +38,9 @@ $(BINDIR)/ngxData: $(OBJECTS) $(TSTDIR)/ngxData.c
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(CXXLIBS)
 
 $(BINDIR)/ngxls: $(OBJECTS) $(TSTDIR)/ngxls.c
+	$(CXX) $(CXXFLAGS) -o $@ $^ $(CXXLIBS)
+
+$(BINDIR)/ngxar: $(OBJECTS) $(TSTDIR)/ngxar.c
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(CXXLIBS)
 
 $(BINDIR)/ngxTree: $(OBJECTS) $(TSTDIR)/ngxTree.c
