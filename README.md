@@ -1,4 +1,5 @@
 # NGX - New Engine Ten
+[![Build Status](https://travis-ci.org/masscry/ngx.svg?branch=master)](https://travis-ci.org/masscry/ngx)
 
 Project consists of several low-level algoritms for general game development 
 and provides test and examples of their usage in form of turn-base tactical 
