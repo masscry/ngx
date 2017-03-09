@@ -29,7 +29,7 @@ struct ngx_entry_t {
 struct ngx_findex_t {
   uint16_t size; // 2
   uint16_t cap; // 2
-  char reserved[11]; // 11
+  char reserved[NGXINITSTLEN - 2]; // 11
   struct ngx_entry_t entries[];
 };
 
@@ -191,4 +191,86 @@ int ngxIndexErase(NGXINDEX index, const char* key) {
   }
 
   return ngxIndexRemove(index, item);
+}
+
+uint16_t ngxIndexSave(NGXARC arc, const NGXINDEX index, uint16_t loc){
+  struct ngx_findex_t* findex = 0;
+  uint16_t result = 0xFFFF;
+
+  if ((arc == 0) || (index == 0)){
+    return 0xFFFF;
+  }
+
+  findex = (struct ngx_findex_t*) malloc(
+    sizeof(struct ngx_findex_t) + sizeof(struct ngx_entry_t)*ngxIndexCap(index)
+  );
+  if (findex == 0){
+    return 0xFFFF;
+  }
+
+  memset(findex, 0x55, sizeof(struct ngx_findex_t));
+  findex->cap = ngxIndexCap(index);
+  findex->size = ngxIndexSize(index);
+  memcpy(
+    findex->entries,
+    index->entries,
+    sizeof(struct ngx_entry_t)*ngxIndexCap(index)
+  );
+
+  result = ngxArcDataPut(arc, findex,
+    sizeof(struct ngx_findex_t) + sizeof(struct ngx_entry_t)*findex->cap, loc);
+
+  free(findex);
+  return result;
+}
+
+NGXINDEX ngxIndexLoad(NGXARC arc, uint16_t head) {
+  struct ngx_findex_t* findex = 0;
+  NGXINDEX result = 0;
+  uint32_t len = 0;
+
+  if ((arc == 0) || (head == 0xFFFF)){
+    return 0;
+  }
+
+  findex = ngxArcDataGet(arc, head, &len);
+
+  if (len != findex->cap*sizeof(struct ngx_entry_t) + sizeof(struct ngx_findex_t)){
+    free(findex);
+    return 0;
+  }
+
+  result = ngxIndexInit();
+  if (result == 0){
+    free(findex);
+    return 0;
+  }
+
+  result->size = findex->size;
+  result->cap = findex->cap;
+  free(result->entries);
+
+  result->entries = malloc(sizeof(struct ngx_entry_t)*findex->cap);
+  if (result->entries == 0){
+    free(findex);
+    return 0;
+  }
+
+  memcpy(result->entries, findex->entries, sizeof(struct ngx_entry_t)*findex->cap);
+  free(findex);
+  return result;
+}
+
+const char* ngxEntryKey(const NGXENTRY entry) {
+  if (entry == 0){
+    return 0;
+  }
+  return entry->key;
+}
+
+uint16_t ngxEntryValue(const NGXENTRY entry) {
+  if (entry == 0){
+    return 0xFFFF;
+  }
+  return entry->value;
 }

@@ -25,7 +25,11 @@ int ngxIndexErase(NGXINDEX index, const char* key);
 
 NGXENTRY ngxIndexFind(const NGXINDEX index, const char* key);
 
-uint16_t ngxIndexSave(NGXARC arc, const NGXINDEX index);
+const char* ngxEntryKey(const NGXENTRY entry);
+
+uint16_t ngxEntryValue(const NGXENTRY entry);
+
+uint16_t ngxIndexSave(NGXARC arc, const NGXINDEX index, uint16_t loc);
 
 NGXINDEX ngxIndexLoad(NGXARC arc, uint16_t head);
 

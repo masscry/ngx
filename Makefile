@@ -27,8 +27,8 @@ clean:
 
 test: $(BINDIR)/ngxData $(BINDIR)/ngxls $(BINDIR)/ngxTree
 	$(BINDIR)/ngxData test.ngx
+	$(BINDIR)/ngxTree test.ngx
 	$(BINDIR)/ngxls test.ngx
-	$(BINDIR)/ngxTree
 
 $(BINDIR) $(OBJDIR):
 	mkdir -v $@

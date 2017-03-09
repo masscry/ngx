@@ -42,7 +42,7 @@ void test000(){
 
   EXPECT(ngxIndexFind(index, "abc") == 0);
 
-  EXPECT(ngxIndexRemove(index, "abc") != 0);
+  EXPECT(ngxIndexErase(index, "abc") != 0);
 
   ngxIndexCleanup(&index);
   EXPECT(index == 0);
@@ -53,12 +53,13 @@ void test001(const char* fname){
   NGXINDEX index = ngxIndexInit();
   NGXINDEX nindex = 0;
   uint16_t head = 0xFFFF;
+  NGXENTRY e = 0;
 
   ngxIndexInsert(index, "abc", 1);
   ngxIndexInsert(index, "bac", 2);
   ngxIndexInsert(index, "bca", 3);
 
-  head = ngxIndexSave(arc, index);
+  head = ngxIndexSave(arc, index, 5);
 
   EXPECT(head != 0xFFFF);
 
@@ -66,6 +67,26 @@ void test001(const char* fname){
 
   EXPECT(nindex != 0);
 
+  EXPECT(ngxIndexSize(nindex) == ngxIndexSize(index));
+
+  e = ngxIndexFind(nindex, "abc");
+  EXPECT(e != 0);
+  EXPECT(strcmp(ngxEntryKey(e), "abc") == 0);
+  EXPECT(ngxEntryValue(e) == 1);
+
+  e = ngxIndexFind(nindex, "bac");
+  EXPECT(e != 0);
+  EXPECT(strcmp(ngxEntryKey(e), "bac") == 0);
+  EXPECT(ngxEntryValue(e) == 2);
+
+  e = ngxIndexFind(nindex, "bca");
+  EXPECT(e != 0);
+  EXPECT(strcmp(ngxEntryKey(e), "bca") == 0);
+  EXPECT(ngxEntryValue(e) == 3);
+
+  ngxIndexCleanup(&nindex);
+  ngxIndexCleanup(&index);
+  ngxArcCleanup(&arc);
 }
 
 int main(int argc, char* argv[]){
