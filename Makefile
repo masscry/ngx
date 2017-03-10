@@ -15,7 +15,7 @@ OBJECTS=$(patsubst $(SRCDIR)/%,$(OBJDIR)/%,$(patsubst %.c,%.o,$(SOURCES)))
 
 .PHONY: clean run test
 
-all: $(BINDIR) $(OBJDIR) $(BINDIR)/$(PROJECT)
+all: $(BINDIR) $(OBJDIR) $(BINDIR)/$(PROJECT) $(BINDIR)/ngxData $(BINDIR)/ngxls $(BINDIR)/ngxTree $(BINDIR)/ngxar
 	@echo "Done!"
 
 run: $(BINDIR) $(OBJDIR) $(BINDIR)/$(PROJECT)
