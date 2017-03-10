@@ -8,6 +8,7 @@
 
 #include <stdint.h>
 #include <stddef.h>
+#include <stdio.h>
 
 #ifndef __DATA_HEADER__
 #define __DATA_HEADER__
@@ -75,5 +76,10 @@ uint16_t ngxArcDataPut(NGXARC arc, const void* data, uint32_t datalen, uint16_t 
  * Get data from archive.
  */
 void* ngxArcDataGet(NGXARC arc, uint16_t blkid, uint32_t* datalen);
+
+/**
+ * Get data from file.
+ */
+void* ngxDataGet(FILE* file, uint32_t* datalen);
 
 #endif /* __DATA_HEADER__ */

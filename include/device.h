@@ -20,6 +20,11 @@ struct ngx_device_t;
 typedef struct ngx_device_t* NGXDEVICE;
 
 /**
+ * Rendering callback.
+ */
+typedef void (*NGXDRAWFUNC)(double dt);
+
+/**
  * Initialize rendering device.
  */
 NGXDEVICE ngxInit();
@@ -33,6 +38,11 @@ void ngxCleanup(NGXDEVICE* pdev);
  * Update rendering device state.
  */
 int ngxUpdate(NGXDEVICE dev);
+
+/**
+ * Set new draw func.
+ */
+int ngxDrawFunc(NGXDEVICE dev, NGXDRAWFUNC func);
 
 /**
  * Time from device start.

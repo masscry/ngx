@@ -5,6 +5,12 @@
 #include <stdint.h>
 #include <string.h>
 
+#ifdef __DATA_DEBUG__
+#define DLOG(fmt, ...) fprintf(stderr, fmt "\n",  ##__VA_ARGS__)
+#else
+#define DLOG(...)
+#endif
+
 struct ngx_archive_t {
   FILE* fl;
   uint16_t blkoff;
@@ -476,6 +482,41 @@ void* ngxArcDataGet(NGXARC arc, uint16_t blkid, uint32_t* datalen){
 
   if (datalen != 0){
     *datalen = totlen;
+  }
+  return result;
+}
+
+void* ngxDataGet(FILE* file, uint32_t* datalen) {
+  void* result = 0;
+  uint32_t dlen = 0;
+
+  if (fseek(file, 0, SEEK_END) != 0){
+    DLOG("%s", "Seek failed");
+    return 0;
+  }
+
+  dlen = ftell(file);
+
+  result = malloc(dlen);
+  if (result == 0){
+    DLOG("%s", "Malloc failed");
+    return 0;
+  }
+
+  if (fseek(file, 0, SEEK_SET) != 0){
+    DLOG("%s", "Seek-2 failed");
+    free(result);
+    return 0;
+  }
+
+  if (fread(result, dlen, 1, file) != 1){
+    DLOG("%s", "Read failed");
+    free(result);
+    return 0;
+  }
+
+  if (datalen != 0){
+    *datalen = dlen;
   }
   return result;
 }

@@ -34,7 +34,42 @@ struct ngx_device_t {
   uint64_t counter;
   int state;
   struct timespec start;
+  NGXDRAWFUNC drawfunc;
 };
+
+static void ngxDefaultDraw(double dt) {
+  glBegin(GL_TRIANGLES);
+
+  glColor3f(1.0f,0.0f,0.0f);                      // Красный
+  glVertex3f( 0.0f, 1.0f, 0.0f);                  // Верх треугольника (Передняя)
+  glColor3f(0.0f,1.0f,0.0f);                      // Зеленный
+  glVertex3f(-1.0f,-1.0f, 1.0f);                  // Левая точка
+  glColor3f(0.0f,0.0f,1.0f);                      // Синий
+  glVertex3f( 1.0f,-1.0f, 1.0f);                  // Правая точка
+
+  glColor3f(1.0f,0.0f,0.0f);                      // Красная
+  glVertex3f( 0.0f, 1.0f, 0.0f);                  // Верх треугольника (Правая)
+  glColor3f(0.0f,0.0f,1.0f);                      // Синия
+  glVertex3f( 1.0f,-1.0f, 1.0f);                  // Лево треугольника (Правая)
+  glColor3f(0.0f,1.0f,0.0f);                      // Зеленная
+  glVertex3f( 1.0f,-1.0f, -1.0f);                 // Право треугольника (Правая)
+
+  glColor3f(1.0f,0.0f,0.0f);                      // Красный
+  glVertex3f( 0.0f, 1.0f, 0.0f);                  // Низ треугольника (Сзади)
+  glColor3f(0.0f,1.0f,0.0f);                      // Зеленный
+  glVertex3f( 1.0f,-1.0f, -1.0f);                 // Лево треугольника (Сзади)
+  glColor3f(0.0f,0.0f,1.0f);                      // Синий
+  glVertex3f(-1.0f,-1.0f, -1.0f);                 // Право треугольника (Сзади)
+
+  glColor3f(1.0f,0.0f,0.0f);                      // Красный
+  glVertex3f( 0.0f, 1.0f, 0.0f);                  // Верх треугольника (Лево)
+  glColor3f(0.0f,0.0f,1.0f);                      // Синий
+  glVertex3f(-1.0f,-1.0f,-1.0f);                  // Лево треугольника (Лево)
+  glColor3f(0.0f,1.0f,0.0f);                      // Зеленный
+  glVertex3f(-1.0f,-1.0f, 1.0f);                  // Право треугольника (Лево)
+
+  glEnd();
+}
 
 NGXDEVICE ngxInit(){
   NGXDEVICE dev = 0;
@@ -67,6 +102,7 @@ NGXDEVICE ngxInit(){
   dev->counter = 0;
   dev->state = NGX_INIT;
   clock_gettime(CLOCK_MONOTONIC, &dev->start);
+  dev->drawfunc = ngxDefaultDraw;
   fclose(log);
   return dev;
 }
@@ -186,7 +222,7 @@ void ngxCloseWindow(NGXDEVICE dev){
 
 
 float angle = 0.0f;
-void Scene(double delta){
+void Scene(NGXDEVICE dev, double delta){
   angle += delta * 10.0;
 
   glViewport(0, 0, 800, 600);
@@ -197,40 +233,10 @@ void Scene(double delta){
   glMatrixMode(GL_MODELVIEW);
 
   glLoadIdentity();
-  glTranslatef(0.0f, 0.0f, -6.0f);
+  gluLookAt(10.0, 10.0, 10.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+
   glRotatef(angle, 0.0f, 1.0f, 0.0f);
-
-  glBegin(GL_TRIANGLES);
-
-  glColor3f(1.0f,0.0f,0.0f);                      // Красный
-  glVertex3f( 0.0f, 1.0f, 0.0f);                  // Верх треугольника (Передняя)
-  glColor3f(0.0f,1.0f,0.0f);                      // Зеленный
-  glVertex3f(-1.0f,-1.0f, 1.0f);                  // Левая точка
-  glColor3f(0.0f,0.0f,1.0f);                      // Синий
-  glVertex3f( 1.0f,-1.0f, 1.0f);                  // Правая точка
-
-  glColor3f(1.0f,0.0f,0.0f);                      // Красная
-  glVertex3f( 0.0f, 1.0f, 0.0f);                  // Верх треугольника (Правая)
-  glColor3f(0.0f,0.0f,1.0f);                      // Синия
-  glVertex3f( 1.0f,-1.0f, 1.0f);                  // Лево треугольника (Правая)
-  glColor3f(0.0f,1.0f,0.0f);                      // Зеленная
-  glVertex3f( 1.0f,-1.0f, -1.0f);                 // Право треугольника (Правая)
-
-  glColor3f(1.0f,0.0f,0.0f);                      // Красный
-  glVertex3f( 0.0f, 1.0f, 0.0f);                  // Низ треугольника (Сзади)
-  glColor3f(0.0f,1.0f,0.0f);                      // Зеленный
-  glVertex3f( 1.0f,-1.0f, -1.0f);                 // Лево треугольника (Сзади)
-  glColor3f(0.0f,0.0f,1.0f);                      // Синий
-  glVertex3f(-1.0f,-1.0f, -1.0f);                 // Право треугольника (Сзади)
-
-  glColor3f(1.0f,0.0f,0.0f);                      // Красный
-  glVertex3f( 0.0f, 1.0f, 0.0f);                  // Верх треугольника (Лево)
-  glColor3f(0.0f,0.0f,1.0f);                      // Синий
-  glVertex3f(-1.0f,-1.0f,-1.0f);                  // Лево треугольника (Лево)
-  glColor3f(0.0f,1.0f,0.0f);                      // Зеленный
-  glVertex3f(-1.0f,-1.0f, 1.0f);                  // Право треугольника (Лево)
-
-  glEnd();
+  dev->drawfunc(delta);
 
 }
 
@@ -275,7 +281,7 @@ RENDER:
 
     now = ngxNow(dev);
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-    Scene(now - timed);
+    Scene(dev, now - timed);
     glXSwapBuffers(dev->dsp.dpy, dev->dsp.win);
     timed = now;
 
@@ -288,4 +294,17 @@ RENDER:
     return 0;
   }
 
+}
+
+int ngxDrawFunc(NGXDEVICE dev, NGXDRAWFUNC func) {
+  if (dev == 0) {
+    return -1;
+  }
+
+  if (func == 0){
+    dev->drawfunc = ngxDefaultDraw;
+    return 0;
+  }
+  dev->drawfunc = func;
+  return 0;
 }
