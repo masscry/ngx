@@ -1,0 +1,15 @@
+# Comments
+
+key value
+
+block {
+  key1 value2
+  key2 value3
+}
+
+block1.key3 value4
+block1.key4 value5
+
+number -123.0
+str "two words"
+

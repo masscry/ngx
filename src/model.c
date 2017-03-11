@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <math.h>
 
 #include <GL/gl.h>
 #include <GL/glu.h>
@@ -31,7 +32,8 @@ void ngxModelDraw(const NGXMODEL mdl) {
 
   glBegin(GL_TRIANGLES);
   for (int i = 0; i < mdl->vcnt; ++i){
-    glColor3fv(mdl->vdt[i].n);
+    glColor3f( fabsf(mdl->vdt[i].n[0]), fabsf(mdl->vdt[i].n[1]), fabsf(mdl->vdt[i].n[2]));
+//    glColor3f(0.5f, 0.5f, 0.5f);
     glVertex3fv(mdl->vdt[i].v);
   }
   glEnd();

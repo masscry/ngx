@@ -263,6 +263,7 @@ void Scene(NGXDEVICE dev, double delta){
   gluLookAt(10.0, 10.0, 10.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
 
   glRotatef(angle, 0.0f, 1.0f, 0.0f);
+//  glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
   dev->drawfunc(delta, dev->ptr);
 
 }
