@@ -6,8 +6,14 @@
 
 NGXMODEL mdl = 0;
 
-void Render(double dt) {
+void Render(double dt, void* ptr) {
   ngxModelDraw(mdl);
+}
+
+int prs = 0;
+void Keys(int key, void* ptr) {
+  NGXDEVICE dev = (NGXDEVICE) ptr;
+  ngxSetPerspective(dev, (prs = !prs));
 }
 
 int main(int argc, char* argv[]){
@@ -33,6 +39,8 @@ int main(int argc, char* argv[]){
     }
     ngxDrawFunc(dev, Render);
   }
+  ngxKeyFunc(dev, Keys);
+  ngxPointer(dev, dev);
 
   while (ngxUpdate(dev) != 0){
     ;

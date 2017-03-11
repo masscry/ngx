@@ -8,7 +8,7 @@ TSTDIR=./test
 
 CXX=gcc
 CXXFLAGS=-g3 -std=gnu99 -I$(INCDIR) -pedantic
-CXXLIBS=-lGL -lGLU -lX11
+CXXLIBS=-lGL -lGLU -lX11 -lm
 
 SOURCES=$(wildcard $(SRCDIR)/*.c)
 OBJECTS=$(patsubst $(SRCDIR)/%,$(OBJDIR)/%,$(patsubst %.c,%.o,$(SOURCES)))

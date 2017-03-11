@@ -6,6 +6,8 @@
 #include <stdarg.h>
 #include <time.h>
 #include <string.h>
+#include <limits.h>
+#include <math.h>
 
 #include <X11/X.h>
 #include <X11/Xlib.h>
@@ -35,9 +37,17 @@ struct ngx_device_t {
   int state;
   struct timespec start;
   NGXDRAWFUNC drawfunc;
+  NGXKEYFUNC keyfunc;
+  void* ptr;
+  uint8_t keys[USHRT_MAX];
+  int persp;
 };
 
-static void ngxDefaultDraw(double dt) {
+static void ngxDefaultKey(int key, void* ptr) {
+  ;
+}
+
+static void ngxDefaultDraw(double dt, void* ptr) {
   glBegin(GL_TRIANGLES);
 
   glColor3f(1.0f,0.0f,0.0f);                      // Красный
@@ -103,6 +113,9 @@ NGXDEVICE ngxInit(){
   dev->state = NGX_INIT;
   clock_gettime(CLOCK_MONOTONIC, &dev->start);
   dev->drawfunc = ngxDefaultDraw;
+  dev->keyfunc = ngxDefaultKey;
+  memset(dev->keys, 0, USHRT_MAX);
+  dev->persp = 0;
   fclose(log);
   return dev;
 }
@@ -181,7 +194,7 @@ int ngxOpenWindow(NGXDEVICE dev){
   cmap = XCreateColormap(tdsp.dpy, root, vi->visual, AllocNone);
 
   swa.colormap = cmap;
-  swa.event_mask = ExposureMask | KeyPressMask;
+  swa.event_mask = ExposureMask | KeyPressMask | KeyReleaseMask;
 
   tdsp.win = XCreateWindow(
     tdsp.dpy,
@@ -220,6 +233,19 @@ void ngxCloseWindow(NGXDEVICE dev){
   XCloseDisplay(dev->dsp.dpy);
 }
 
+void SetPerspective(int enable, double fovY, double aspect, double zNear, double zFar ) {
+  const GLdouble pi = 3.1415926535897932384626433832795;
+  GLdouble fW, fH;
+  fH = tan( fovY / 360 * pi ) * zNear;
+  fW = fH * aspect;
+  if (enable != 0) {
+    glFrustum( -fW, fW, -fH, fH, zNear, zFar );
+  } else {
+    fW *= 180.0;
+    fH *= 180.0;
+    glOrtho(-fW, fW, -fH, fH, zNear, zFar);
+  }
+}
 
 float angle = 0.0f;
 void Scene(NGXDEVICE dev, double delta){
@@ -228,7 +254,8 @@ void Scene(NGXDEVICE dev, double delta){
   glViewport(0, 0, 800, 600);
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
-  gluPerspective(45.0f, 800.0/600.0, 0.1f, 100.0f);
+
+  SetPerspective(dev->persp, 45.0, 800.0/600.0, 0.1, 1000.0 );
 
   glMatrixMode(GL_MODELVIEW);
 
@@ -236,7 +263,7 @@ void Scene(NGXDEVICE dev, double delta){
   gluLookAt(10.0, 10.0, 10.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
 
   glRotatef(angle, 0.0f, 1.0f, 0.0f);
-  dev->drawfunc(delta);
+  dev->drawfunc(delta, dev->ptr);
 
 }
 
@@ -271,7 +298,26 @@ int ngxUpdate(NGXDEVICE dev){
         dev->state = NGX_CLOS;
         break;
       case KeyPress:
+      {
+        int key = XLookupKeysym(&evt.xkey, ((evt.xkey.state&ShiftMask)!=0));
+        if (key < USHRT_MAX) {
+          dev->keys[key] = 1;
+          dev->keyfunc(key, dev->ptr);
+        } else {
+          ngxLog(dev, "Bad code: %X", key);
+        }
         break;
+      }
+      case KeyRelease:
+      {
+        int key = XLookupKeysym(&evt.xkey, ((evt.xkey.state&ShiftMask)!=0));
+        if (key < USHRT_MAX) {
+          dev->keys[key] = 0;
+        } else {
+          ngxLog(dev, "Bad code: %d", key);
+        }
+        break;
+      }
       default:
         ngxLog(dev, "Event%X", evt.type);
       }
@@ -307,4 +353,35 @@ int ngxDrawFunc(NGXDEVICE dev, NGXDRAWFUNC func) {
   }
   dev->drawfunc = func;
   return 0;
+}
+
+int ngxKeyFunc(NGXDEVICE dev, NGXKEYFUNC func) {
+  if (dev == 0) {
+    return -1;
+  }
+
+  if (func == 0){
+    dev->keyfunc = ngxDefaultKey;
+    return 0;
+  }
+
+  dev->keyfunc = func;
+  return 0;
+}
+
+int ngxPointer(NGXDEVICE dev, void* ptr) {
+  if (dev == 0) {
+    return -1;
+  }
+
+  dev->ptr = ptr;
+  return 0;
+}
+
+int ngxSetPerspective(NGXDEVICE dev, int enable) {
+  if (dev != 0){
+    dev->persp = enable;
+    return 0;
+  }
+  return -1;
 }
