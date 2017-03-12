@@ -18,7 +18,7 @@ CNFTST=./test/cnf
 
 .PHONY: clean test
 
-all: $(LIBDIR) $(OBJDIR) $(INCDIR) $(LIBDIR)/$(NGXCNF)
+all: $(LIBDIR) $(OBJDIR) $(LIBDIR)/$(NGXCNF)
 	@echo "Done with $(NGXCNF)"
 
 clean:
@@ -36,7 +36,7 @@ test: $(CNFTST)
 $(CNFTST): $(CNFTST).c $(LIBDIR)/$(NGXCNF)
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
-$(OBJDIR) $(LIBDIR) $(INCDIR):
+$(OBJDIR) $(LIBDIR):
 	mkdir $@
 
 $(LIBDIR)/$(NGXCNF): $(OBJECTS)
