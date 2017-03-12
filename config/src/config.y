@@ -46,7 +46,7 @@ key_value_list:
     | key_value_list key_value
 
 input:
-      %empty
+      /* empty */
     | key_value_list
 
 %%
