@@ -9,8 +9,8 @@
 #include <stdio.h>
 #include <stdint.h>
 
-#include "config.tab.h"
-#include "config.h"
+#include <config.tab.h>
+#include <config.h>
 
 void yyerror(YYLTYPE* loc, void* scanner, const char* msg);
 

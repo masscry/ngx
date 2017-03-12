@@ -2,7 +2,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "config.tab.h"
+#include <config.tab.h>
 
 #define YY_USER_ACTION \
   yylloc->first_line = yylloc->last_line = yylineno;\
