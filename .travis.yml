@@ -1,8 +1,23 @@
 language: c
 
+env:
+  global:
+    - secure: "dTXQh6mIpPVVZwHNFbp7aT/L0tCd+v1rxnMucOSiwU9g56N9mxvwKQy/L22D0l7x6oXYUSctYgDFKwRcJWPl/QduCr61IrL8ecUQ+wEVrNyIF2+xavtCnj2Mxc7IMaoADRR2tJaYV4ninyyp9BtGOVbTnmig3BQDl2i01D6fEOQh5WMcSC0vle2VGvaQqxWmNzaR24gfuF1dac+3wmEYd3vMg1OSCQtT0Yl6m5h+ms08t0IVtwLTAlIvkG5qdGyT+0T96kh4X6Gv9r9t3HN0xIX+SOQy1ZR3vQF8k4OfDCpcPwzKfveMlBzzFFjvbhgx2GAR8X3AW3r7tl5IlkEtf/9vsEj0M1Pw4mSgcpEiv3rEIdbSnNaWzdOYMqR4znNMNTVgEdkaywfTgUa518aW7PQDtcfVVWVYYeXEPhG26tvJtAnGzr5mWNvp/iPnkbPvHqilAVWOFiwhISI1kX7fl7vuvpRGTm0F4jpdIMRlx3Hn/c+y9ZAtlIBfLXeNGLvDj7d+iciRLJVfsf8hn/24RLhL8nJ88LUQROkSbZsYwwGvbyUDAFnan+QfzaXTYwog+ITMPGPUQciRk/LxB9hFYGk2Nac7S0Ni946TvQ+D/XYknTry8g2A9Bs1rY2IWb0iTj3Vq9fxF1WNvu1La3gBb4/kd2pJUsNHvXWRLvc8a8A="
+
 before_install:
 - sudo apt-get update -qq
 - sudo apt-get install -qq libgl1-mesa-dev libglu1-mesa-dev libx11-dev
+- echo -n | openssl s_client -connect scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-
+
+addons:
+  coverity_scan:
+    project:
+      name: "masscry/ngx"
+      description: "NGX - New Engine Ten"
+    notification_email: masscry@gmail.com
+    build_command_prepend: "make clean"
+    build_command: "make; make test"
+    branch_pattern: coverity_scan
 
 install: true
 

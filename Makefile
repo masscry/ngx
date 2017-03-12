@@ -6,16 +6,25 @@ OBJDIR=./obj
 INCDIR=./include
 TSTDIR=./test
 
+CNFLIBDIR=./config
+
+CNFLIB=$(CNFLIBDIR)/lib/libngxcnf.a
+
+NGXLIBS=$(CNFLIB)
+NGXINCL=$(CNFLIBDIR)/include
+
 CXX=gcc
-CXXFLAGS=-g3 -std=gnu99 -I$(INCDIR) -pedantic
+CXXFLAGS=-g3 -std=gnu99 -I$(INCDIR) -I$(NGXINCL) -pedantic -Werror=implicit-function-declaration
 CXXLIBS=-lGL -lGLU -lX11 -lm
 
+export
+
 SOURCES=$(wildcard $(SRCDIR)/*.c)
-OBJECTS=$(patsubst $(SRCDIR)/%,$(OBJDIR)/%,$(patsubst %.c,%.o,$(SOURCES)))
+OBJECTS=$(patsubst $(SRCDIR)/%,$(OBJDIR)/%,$(patsubst %.c,%.o,$(SOURCES))) $(NGXLIBS)
 
-.PHONY: clean run test
+.PHONY: clean run test conflib
 
-all: $(BINDIR) $(OBJDIR) $(BINDIR)/$(PROJECT) $(BINDIR)/ngxData $(BINDIR)/ngxls $(BINDIR)/ngxTree $(BINDIR)/ngxar
+all: $(BINDIR) $(OBJDIR) $(BINDIR)/$(PROJECT) $(BINDIR)/ngxData $(BINDIR)/ngxls $(BINDIR)/ngxTree $(BINDIR)/ngxar conflib
 	@echo "Done!"
 
 run: $(BINDIR) $(OBJDIR) $(BINDIR)/$(PROJECT)
@@ -24,12 +33,18 @@ run: $(BINDIR) $(OBJDIR) $(BINDIR)/$(PROJECT)
 clean:
 	rm -rvf $(BINDIR)/
 	rm -rvf $(OBJDIR)/
+	make -C $(CNFLIBDIR) clean
 
 test: $(BINDIR)/ngxData $(BINDIR)/ngxls $(BINDIR)/ngxTree $(BINDIR)/ngxar
+	rm -fv test.ngx
+	rm -fv src.ngx
 	$(BINDIR)/ngxData test.ngx
 	$(BINDIR)/ngxTree test.ngx
 	$(BINDIR)/ngxls test.ngx
 	$(BINDIR)/ngxar src.ngx src/*.c include/*.h test/*.c
+#	make -C $(CNFLIBDIR) test
+
+conflib: $(CNFLIB)
 
 $(BINDIR) $(OBJDIR):
 	mkdir -v $@
@@ -52,3 +67,5 @@ $(BINDIR)/$(PROJECT): $(OBJECTS) $(PROJECT)/entry.c
 $(OBJDIR)/%.o: $(SRCDIR)/%.c
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
 
+$(CNFLIB):
+	$(MAKE) -C $(CNFLIBDIR)
