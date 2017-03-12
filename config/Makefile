@@ -48,10 +48,10 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.c
 $(OBJDIR)/%.tab.o: $(SRCDIR)/%.tab.c $(INCDIR)/config.h
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
 
-$(SRCDIR)/config.tab.c $(INCDIR)/config.tab.h: $(SRCYCC)
+$(SRCDIR)/config.tab.c $(INCDIR)/config.tab.h: $(SRCYCC) $(SRCDIR)/config.c
 	$(BISON) -d $(SRCYCC)
 	mv config.tab.c $(SRCDIR)
 	mv config.tab.h $(INCDIR)
 
-$(SRCDIR)/config.c $(INCDIR)/config.h: $(SRCLEX)
+$(SRCDIR)/config.c: $(SRCLEX)
 	$(FLEX) -o $(SRCDIR)/config.c --header-file=$(INCDIR)/config.h $(SRCLEX)
