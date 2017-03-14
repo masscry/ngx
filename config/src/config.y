@@ -32,6 +32,10 @@ void yyerror(YYLTYPE* loc, void* scanner, const char* msg);
 %union { double num; }
 %token <num> NUMBER
 
+%token BLOPEN
+
+%token BLCLOSE
+
 %destructor { free($$); $$ = 0; } <str>
 
 %start input
@@ -40,13 +44,22 @@ void yyerror(YYLTYPE* loc, void* scanner, const char* msg);
 
 key_value:
       STRING NUMBER { printf("%s: %g\n", $1, $2); }
+    | STRING STRING { printf("%s: %s\n", $1, $2); }
 
 key_value_list:
       key_value
     | key_value_list key_value
 
+block:
+    STRING BLOPEN key_value_list BLCLOSE { printf("Block: %s\n", $1); }
+
+block_list:
+      block
+    | block_list block
+    | key_value_list block
+
 input:
       /* empty */
-    | key_value_list
+    | block_list
 
 %%

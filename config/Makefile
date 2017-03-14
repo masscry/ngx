@@ -31,7 +31,7 @@ clean:
 	rm -rvf $(INCDIR)/config.h
 
 test: $(CNFTST)
-	$(CNFTST)
+#	cat ./test/config.txt | $(CNFTST)
 
 $(CNFTST): $(CNFTST).c $(LIBDIR)/$(NGXCNF)
 	$(CXX) $(CXXFLAGS) -o $@ $^

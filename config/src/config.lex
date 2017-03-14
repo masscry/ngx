@@ -19,9 +19,11 @@
 
 %%
 
+[#].*\n                   { /* IGNORE COMMENTS */  }
 [[:digit:]]+              { yylval->num = atof(yytext); return NUMBER;    }
 [_[:alpha:]][_[:alnum:]]* { yylval->str = strdup(yytext); return STRING;  }
-
+[{]                       { return BLOPEN; }
+[}]                       { return BLCLOSE; }
 .                         { /* DO NOTHING */ }
 
 %%

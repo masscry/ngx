@@ -3,3 +3,8 @@
 *.swp
 bin/*
 *.ngx
+*.a
+config/include/config.h
+config/include/config.tab.h
+config/src/config.c
+config/src/config.tab.c
