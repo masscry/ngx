@@ -15,6 +15,7 @@ SOURCES=$(wildcard $(SRCDIR)/*.c) $(SRCDIR)/config.tab.c $(SRCDIR)/config.c
 OBJECTS=$(patsubst $(SRCDIR)/%,$(OBJDIR)/%,$(patsubst %.c,%.o,$(SOURCES)))
 
 CNFTST=./test/cnf
+TSTTRR=./test/testct
 
 .PHONY: clean test
 
@@ -30,10 +31,14 @@ clean:
 	rm -rvf $(SRCDIR)/config.c
 	rm -rvf $(INCDIR)/config.h
 
-test: $(CNFTST)
+test: $(CNFTST) $(TSTTRR)
 #	cat ./test/config.txt | $(CNFTST)
+	$(TSTTRR)
 
 $(CNFTST): $(CNFTST).c $(LIBDIR)/$(NGXCNF)
+	$(CXX) $(CXXFLAGS) -o $@ $^
+
+$(TSTTRR): $(TSTTRR).c $(LIBDIR)/$(NGXCNF)
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
 $(OBJDIR) $(LIBDIR):
