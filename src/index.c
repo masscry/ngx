@@ -66,6 +66,7 @@ NGXINDEX ngxIndexInit(){
 
 void ngxIndexCleanup(NGXINDEX* pindex){
   if ((pindex != 0) && (*pindex != 0)) {
+    free((*pindex)->entries);
     free(*pindex);
     *pindex = 0;
   }
@@ -253,6 +254,7 @@ NGXINDEX ngxIndexLoad(NGXARC arc, uint16_t head) {
   result->entries = malloc(sizeof(struct ngx_entry_t)*findex->cap);
   if (result->entries == 0){
     free(findex);
+    ngxIndexCleanup(&result);
     return 0;
   }
 

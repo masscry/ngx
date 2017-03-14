@@ -206,6 +206,9 @@ NGXARC ngxArcInit(const char* filename, int readonly){
 
 FREE_RESULT:
   free(result);
+  if (fl != 0){
+    fclose(fl);
+  }
   return 0;
 }
 
@@ -483,6 +486,8 @@ void* ngxArcDataGet(NGXARC arc, uint16_t blkid, uint32_t* datalen){
   if (datalen != 0){
     *datalen = totlen;
   }
+
+  ngxBlockCleanup(&root);
   return result;
 }
 
