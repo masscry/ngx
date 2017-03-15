@@ -86,7 +86,8 @@ static int ngxGetHeader(FILE* fl, struct ngx_file_t* pheader, int readonly){
     return -1;
   }
   // Try to read header
-  if (fread(pheader, sizeof(struct ngx_file_t), 1, fl) == 0 ){
+  if (fread(pheader, sizeof(struct ngx_file_t), 1, fl) != 1 ){
+
     if (readonly != 0){
       return -1;
     }
@@ -159,8 +160,6 @@ NGXARC ngxArcInit(const char* filename, int readonly){
   NGXARC result = (NGXARC)malloc(sizeof(struct ngx_archive_t));
   FILE* fl = 0;
   struct ngx_file_t fheader;
-  long int fsize = 0;
-  size_t totsz = 0;
 
   if (result == 0){
     return 0;
@@ -183,17 +182,7 @@ NGXARC ngxArcInit(const char* filename, int readonly){
     goto FREE_RESULT;
   }
 
-  if (fseek(fl, 0, SEEK_END) != 0){
-    goto FREE_RESULT;
-  }
-
-  fsize = ftell(fl);
-  if (fsize < 0){
-    goto FREE_RESULT;
-  }
-
-  totsz = MAX(sizeof(struct ngx_file_t), fheader.blkoff) + fheader.blkcnt*fheader.blksz;
-  if (fsize < totsz){
+  if (fheader.blksz != NGXBLKSIZE ) {
     goto FREE_RESULT;
   }
 
@@ -236,7 +225,7 @@ int ngxGetBlock(NGXARC arc, uint16_t blkid, NGXBLK blk, int readonly){
   }
 
   // Try to read block
-  if (fread(fblk, arc->blksz, 1, arc->fl) == 0 ){
+  if (fread(fblk, arc->blksz, 1, arc->fl) != 1 ){
     if (readonly != 0){
       free(fblk);
       return -1;
@@ -493,7 +482,7 @@ void* ngxArcDataGet(NGXARC arc, uint16_t blkid, uint32_t* datalen){
 
 void* ngxDataGet(FILE* file, uint32_t* datalen) {
   void* result = 0;
-  uint32_t dlen = 0;
+  int32_t dlen = 0;
 
   if (fseek(file, 0, SEEK_END) != 0){
     DLOG("%s", "Seek failed");
@@ -501,6 +490,10 @@ void* ngxDataGet(FILE* file, uint32_t* datalen) {
   }
 
   dlen = ftell(file);
+  if (dlen < 0) {
+    DLOG("%s", "Tell failed");
+    return 0;
+  }
 
   result = malloc(dlen);
   if (result == 0){
