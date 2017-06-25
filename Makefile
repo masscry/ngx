@@ -14,7 +14,7 @@ NGXLIBS=$(CNFLIB)
 NGXINCL=$(CNFLIBDIR)/include
 
 CXX=gcc
-CXXFLAGS=-g3 -std=gnu99 -I$(INCDIR) -I$(NGXINCL) -pedantic -Werror=implicit-function-declaration
+CXXFLAGS=-g3 -std=gnu99 -I$(INCDIR) -I$(NGXINCL) -pedantic -Werror=implicit-function-declaration -Wno-overlength-strings
 CXXLIBS=-lGL -lGLU -lX11 -lm
 
 export
@@ -24,7 +24,7 @@ OBJECTS=$(patsubst $(SRCDIR)/%,$(OBJDIR)/%,$(patsubst %.c,%.o,$(SOURCES))) $(NGX
 
 .PHONY: clean run test conflib
 
-all: $(BINDIR) $(OBJDIR) $(BINDIR)/$(PROJECT) $(BINDIR)/ngxData $(BINDIR)/ngxls $(BINDIR)/ngxTree $(BINDIR)/ngxar conflib
+all: $(BINDIR) $(OBJDIR) $(BINDIR)/$(PROJECT) $(BINDIR)/ngxfl $(BINDIR)/ngxData $(BINDIR)/ngxls $(BINDIR)/ngxTree $(BINDIR)/ngxar conflib
 	@echo "Done!"
 
 run: $(BINDIR) $(OBJDIR) $(BINDIR)/$(PROJECT)
@@ -62,6 +62,9 @@ $(BINDIR)/ngxTree: $(OBJECTS) $(TSTDIR)/ngxTree.c
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(CXXLIBS)
 
 $(BINDIR)/$(PROJECT): $(OBJECTS) $(PROJECT)/entry.c
+	$(CXX) $(CXXFLAGS) -o $@ $^ $(CXXLIBS)
+
+$(BINDIR)/ngxfl: $(OBJECTS) flx/junks.c flx/font.c flx/cell.c flx/flx.c
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(CXXLIBS)
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.c
